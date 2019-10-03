@@ -5,3 +5,5 @@
 *.o
 *.out
 
+# Vscode file
+.vscode
