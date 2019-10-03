@@ -1,0 +1,7 @@
+# Mac file
+.DS_store
+
+# executables
+*.o
+*.out
+
