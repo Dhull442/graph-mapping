@@ -33,6 +33,21 @@ int toVarNumber(long i, long j) {
   return (GphoneIncoming.size() * (i - 1) + j);
 }
 
+/// This function adds clauses that removes mapping to same node in Gphone
+void generateClausesForGphone(vector<string> &clauses) {
+  string currentClause = "";
+  loop(i, 0, GphoneOutgoing.size()) {
+    loop(j, 0, GemailOutgoing.size() - 1) {
+      loop(k, j + 1, GemailOutgoing.size()) {
+        // both k + 1 and i + 1 cannot map to same i
+        currentClause = to_string(-toVarNumber(j + 1, i + 1)) + " " 
+        + to_string(-toVarNumber(k + 1, i + 1)) + " " + "0\n";
+        clauses.push_back(currentClause);
+      }
+    }
+  }
+}
+// TODO: It's possible that we get repeated clauses
 void generateClauses(long currentVar, vector<string> &clauses) {
   vector<long> currentVarNumbers;
   // TODO: can remove if ineffecient
@@ -100,6 +115,7 @@ void writeToFileForMiniSat(string fileName) {
   loop(i, 0, GemailOutgoing.size()) {
     generateClauses(i + 1, clauses);
   }
+  generateClausesForGphone(clauses);
   ofstream fileOut(fileName + ".satinput");
   fileOut<<"p cnf "<<(GemailOutgoing.size() * GphoneOutgoing.size())<<" "<<clauses.size()<<"\n";
   loop(i, 0 ,clauses.size()) {

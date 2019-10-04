@@ -23,3 +23,8 @@ fileReader.o: fileReader.cpp fileReader.h
 # processGraph
 processGraphs.o: processGraphs.cpp fileReader.h processGraphs.h
 	$(CXX) -c processGraphs.cpp -o $@
+
+# Clean
+clean:
+	rm *.o
+	rm $(OUT)
