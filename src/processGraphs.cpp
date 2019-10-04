@@ -81,7 +81,11 @@ void generateClauses(long currentVar, vector<string> &clauses) {
       // now i cannot map to a k such that there is no edge
       // from j + 1 to k, but there is an edge from currentVar to i
       loop(k, 0, GphoneOutgoing.size()) {
-        bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
+        if(k == j)
+          continue;
+        
+        // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
+        bool edgePresent = find(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1) != GphoneOutgoing[j].end();
         if(!edgePresent) {
           currentClause = to_string(-toVarNumber(currentVar, j + 1)) + " " 
           + to_string(-toVarNumber(GemailOutgoing[currentVar - 1][i], k + 1)) + " " + "0\n";
@@ -98,7 +102,10 @@ void generateClauses(long currentVar, vector<string> &clauses) {
       // now i cannot map to a k such that there is no edge
       // from k to j + 1, but there is an edge from i to currentVar
       loop(k, 0, GphoneIncoming.size()) {
-        bool edgePresent = binary_search(GphoneIncoming[j].begin(), GphoneIncoming[j].end(), k + 1);
+        if(k == j)
+          continue;
+        // bool edgePresent = binary_search(GphoneIncoming[j].begin(), GphoneIncoming[j].end(), k + 1);
+        bool edgePresent = find(GphoneIncoming[j].begin(), GphoneIncoming[j].end(), k + 1) != GphoneIncoming[j].end();
         if(!edgePresent) {
           currentClause = to_string(-toVarNumber(currentVar, j + 1)) + " " 
           + to_string(-toVarNumber(GemailIncoming[currentVar - 1][i], k + 1)) + " " + "0\n";
