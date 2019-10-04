@@ -10,9 +10,16 @@ OUT = main
 all: $(OUT)
 
 # Executable
-$(OUT): main.o 
-	$(CXX) main.o -o main $(CXXFLAGS)
+$(OUT): main.o fileReader.o processGraphs.o
+	$(CXX) main.o fileReader.o processGraphs.o -o main $(CXXFLAGS)
 
 # Main
-main.o: fileReader.cpp fileReader.h
+main.o: fileReader.h processGraphs.h
+
+# FileReader
+fileReader.o: fileReader.cpp fileReader.h
 	$(CXX) -c fileReader.cpp -o $@
+
+# processGraph
+processGraphs.o: processGraphs.cpp fileReader.h processGraphs.h
+	$(CXX) -c processGraphs.cpp -o $@

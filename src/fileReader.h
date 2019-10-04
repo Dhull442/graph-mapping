@@ -2,6 +2,7 @@
 #define FILEREADER_INCLUDE
 #include "utils.h"
 #include <vector>
+#define loop(i, start, end) for(long i = start; i < end; i++)
 
 /// Gemail (smaller) graph (contains according to incoming edges)
 extern std::vector<std::vector<long> > GemailIncoming;

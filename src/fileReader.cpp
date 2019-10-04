@@ -2,7 +2,6 @@
 #include "fileReader.h"
 #include <vector>
 #include <fstream>
-#define loop(i, start, end) for(long i = start; i < end; i++)
 using namespace std;
 
 /// Gemail (smaller) graph (contains according to incoming edges)
@@ -45,7 +44,7 @@ void fillVector(bool isGphone, long expectedSizeOutgoing, long expectedSizeIncom
 
 
 void fileReader(string fileName) {
-  ifstream inFile(fileName); 
+  ifstream inFile(fileName + ".graphs"); 
   long count = 0;
   long start, end;
   bool isGphone = true;
@@ -64,15 +63,9 @@ void fileReader(string fileName) {
       GemailIncoming[end - 1].push_back(start);
     }
   }
-}
-
-int main() {
-  fileReader("test.txt");
-  loop(i, 0, GphoneOutgoing.size()) {
-    cout<<i+1<<" ";
-    loop(j, 0, GphoneOutgoing[i].size())
-      cout<<GphoneOutgoing[i][j]<<" ";
-    cout<<"\n";  
-  }
-  return 0;
+  // making incoming and outgoing of the same size
+  long size = max(GphoneOutgoing.size(), GphoneIncoming.size());
+  fillVector(true, size, size);
+  size = max(GemailOutgoing.size(), GemailIncoming.size());
+  fillVector(false, size, size);
 }
