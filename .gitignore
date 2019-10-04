@@ -12,3 +12,4 @@
 *.graphs
 *.satinput
 *.satoutput
+*.mapping

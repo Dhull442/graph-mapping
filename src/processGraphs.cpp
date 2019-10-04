@@ -46,6 +46,53 @@ void generateClausesForGphone(vector<string> &clauses) {
       }
     }
   }
+  // for outgoing edges
+  // adding clause of neighbors
+  loop(l, 0, GphoneOutgoing.size()) {
+    loop(i, 0, GphoneOutgoing[l].size()) {
+      // suppose l + 1 maps to j + 1
+      loop(j, 0, GemailOutgoing.size()) {
+        // now i cannot map to a k such that there is no edge
+        // from j + 1 to k, but there is an edge from l+1 to i
+        loop(k, 0, GemailOutgoing.size()) {
+          if(k == j)
+            continue;
+          
+          // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
+          bool edgePresent = find(GemailOutgoing[j].begin(), GemailOutgoing[j].end(), k + 1) != GemailOutgoing[j].end();
+          if(!edgePresent) {
+            currentClause = to_string(-toVarNumber(j + 1, l + 1)) + " " 
+            + to_string(-toVarNumber(k + 1, GphoneOutgoing[l][i])) + " " + "0\n";
+            clauses.push_back(currentClause);
+          }
+        }
+      }
+    }
+  }
+
+  // for incoming edges
+  // adding clause of neighbors
+  loop(l, 0, GphoneIncoming.size()) {
+    loop(i, 0, GphoneIncoming[l].size()) {
+      // suppose l + 1 maps to j + 1
+      loop(j, 0, GemailIncoming.size()) {
+        // now i cannot map to a k such that there is no edge
+        // from k to j + 1, but there is an edge from i to l + 1
+        loop(k, 0, GemailIncoming.size()) {
+          if(k == j)
+            continue;
+          
+          // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
+          bool edgePresent = find(GemailIncoming[j].begin(), GemailIncoming[j].end(), k + 1) != GemailIncoming[j].end();
+          if(!edgePresent) {
+            currentClause = to_string(-toVarNumber(j + 1, l + 1)) + " " 
+            + to_string(-toVarNumber(k + 1, GphoneIncoming[l][i])) + " " + "0\n";
+            clauses.push_back(currentClause);
+          }
+        }
+      }
+    }
+  }
 }
 // TODO: It's possible that we get repeated clauses
 void generateClauses(long currentVar, vector<string> &clauses) {

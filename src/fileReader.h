@@ -16,9 +16,14 @@ extern std::vector<std::vector<long> > GemailOutgoing;
 /// Gphone (larger) graph (contains according to ougoing edges)
 extern std::vector<std::vector<long> > GphoneOutgoing;
 
-/// This function reads the file 
+/// This function reads the .graphs file  
 /// Parameters:
 /// - fileName: name of the file to be read
-extern void fileReader(std::string);
+extern void fileReaderGraph(std::string);
+
+/// This function reads the .satoutput file and create mapping file
+/// Parameters:
+/// - fileName: name of the file to be read
+extern void fileReaderSat(std::string);
 
 #endif

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "fileReader.h"
 #include <vector>
+#include <cmath>
+#include <algorithm>
 #include <fstream>
 using namespace std;
 
@@ -42,10 +44,34 @@ void fillVector(bool isGphone, long expectedSizeOutgoing, long expectedSizeIncom
   }
 }
 
+void fileReaderSat(string fileName) {
+  ifstream inFile(fileName + ".satoutput"); 
+  ofstream outFile(fileName + ".mapping");
+  string firstLine = "";
+  long var;
+  inFile >> firstLine;
+  if(firstLine == "SAT") {
+    fileReaderGraph(fileName);
+    while(inFile >> var) {
+      if(var > 0) {
+        long startVertex = ceil(double(var) / GphoneOutgoing.size());
+        long endVertex = (var % GphoneOutgoing.size());
+        if(endVertex == 0)
+          endVertex = GphoneOutgoing.size();
+        string output = to_string(startVertex) + " " + to_string(endVertex) + "\n";
+        outFile << output;
+      }
+      if(var == 0) {
+        break;
+      }
+    }
+  } else {
+    outFile << "0\n";
+  }  
+}
 
-void fileReader(string fileName) {
+void fileReaderGraph(string fileName) {
   ifstream inFile(fileName + ".graphs"); 
-  long count = 0;
   long start, end;
   bool isGphone = true;
   // Filling the vectors
