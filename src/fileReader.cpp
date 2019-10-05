@@ -67,7 +67,9 @@ void fileReaderSat(string fileName) {
     }
   } else {
     outFile << "0\n";
-  }  
+  }
+  outFile.close();
+  inFile.close();  
 }
 
 void fileReaderGraph(string fileName) {
@@ -94,4 +96,5 @@ void fileReaderGraph(string fileName) {
   fillVector(true, size, size);
   size = max(GemailOutgoing.size(), GemailIncoming.size());
   fillVector(false, size, size);
+  inFile.close();
 }

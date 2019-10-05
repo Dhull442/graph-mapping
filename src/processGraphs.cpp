@@ -175,6 +175,7 @@ void writeToFileForMiniSat(string fileName) {
   loop(i, 0 ,clauses.size()) {
     fileOut<<clauses[i];
   }
+  fileOut.close();
 }
 
 // int main() {
