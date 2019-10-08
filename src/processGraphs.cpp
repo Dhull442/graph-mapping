@@ -9,6 +9,12 @@ using namespace std;
 vector<vector<long> > correspondanceVector;
 vector<vector<long> > notCorrespondanceVector;
 
+/// This function tells if id i can map to id j
+bool canMap(long i, long j) {
+  return GphoneIncoming[j - 1].size() >= GemailIncoming[i - 1].size() &&
+      GphoneOutgoing[j - 1].size() >= GemailOutgoing[i - 1].size();
+}
+
 // TODO: make this function more effecient
 void calculateCorrespondance() {
   vector<long> emptyVector;
@@ -39,7 +45,7 @@ void generateClausesForGphone(vector<string> &clauses) {
   loop(i, 0, GphoneOutgoing.size()) {
     loop(j, 0, GemailOutgoing.size() - 1) {
       loop(k, j + 1, GemailOutgoing.size()) {
-        // both k + 1 and i + 1 cannot map to same i
+        // both k + 1 and j + 1 cannot map to same i
         currentClause = to_string(-toVarNumber(j + 1, i + 1)) + " " 
         + to_string(-toVarNumber(k + 1, i + 1)) + " " + "0\n";
         clauses.push_back(currentClause);
@@ -60,7 +66,7 @@ void generateClausesForGphone(vector<string> &clauses) {
           
           // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
           bool edgePresent = find(GemailOutgoing[j].begin(), GemailOutgoing[j].end(), k + 1) != GemailOutgoing[j].end();
-          if(!edgePresent) {
+          if(!edgePresent && canMap(j + 1, l + 1) && canMap(k + 1, GphoneOutgoing[l][i])) {
             currentClause = to_string(-toVarNumber(j + 1, l + 1)) + " " 
             + to_string(-toVarNumber(k + 1, GphoneOutgoing[l][i])) + " " + "0\n";
             clauses.push_back(currentClause);
@@ -84,7 +90,7 @@ void generateClausesForGphone(vector<string> &clauses) {
           
           // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
           bool edgePresent = find(GemailIncoming[j].begin(), GemailIncoming[j].end(), k + 1) != GemailIncoming[j].end();
-          if(!edgePresent) {
+          if(!edgePresent && canMap(j + 1, l + 1) && canMap(k + 1, GphoneIncoming[l][i])) {
             currentClause = to_string(-toVarNumber(j + 1, l + 1)) + " " 
             + to_string(-toVarNumber(k + 1, GphoneIncoming[l][i])) + " " + "0\n";
             clauses.push_back(currentClause);
@@ -124,18 +130,22 @@ void generateClauses(long currentVar, vector<string> &clauses) {
   // adding clause of neighbors
   loop(i, 0, GemailOutgoing[currentVar - 1].size()) {
     // suppose currentVar maps to j + 1
-    loop(j, 0, GphoneOutgoing.size()) {
+    loop(j, 0, correspondanceVector[currentVar - 1].size()) {
       // now i cannot map to a k such that there is no edge
       // from j + 1 to k, but there is an edge from currentVar to i
-      loop(k, 0, GphoneOutgoing.size()) {
-        if(k == j)
+      loop(k, 0, correspondanceVector[GemailOutgoing[currentVar - 1][i] - 1].size()) {
+        long GphoneStartId = correspondanceVector[currentVar - 1][j];
+        long GphoneEndId = correspondanceVector[GemailOutgoing[currentVar - 1][i] - 1][k];
+        if(GphoneStartId == GphoneEndId)
           continue;
-        
-        // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
-        bool edgePresent = find(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1) != GphoneOutgoing[j].end();
+
+        bool edgePresent = (find(GphoneOutgoing[GphoneStartId - 1].begin(), GphoneOutgoing[GphoneStartId - 1].end(), GphoneEndId) != GphoneOutgoing[GphoneStartId - 1].end());
+        // bool edgePresent = find(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1) != GphoneOutgoing[j].end();
+        // && (find(correspondanceVector[currentVar - 1].begin(), correspondanceVector[currentVar - 1].end(), j + 1) != correspondanceVector[currentVar - 1].end())
+        // && (find(correspondanceVector[GemailOutgoing[currentVar - 1][i] - 1].begin(), correspondanceVector[GemailOutgoing[currentVar - 1][i] - 1].end(), k + 1) != correspondanceVector[GemailOutgoing[currentVar - 1][i] - 1].end());
         if(!edgePresent) {
-          currentClause = to_string(-toVarNumber(currentVar, j + 1)) + " " 
-          + to_string(-toVarNumber(GemailOutgoing[currentVar - 1][i], k + 1)) + " " + "0\n";
+          currentClause = to_string(-toVarNumber(currentVar, GphoneStartId)) + " " 
+          + to_string(-toVarNumber(GemailOutgoing[currentVar - 1][i], GphoneEndId)) + " " + "0\n";
           clauses.push_back(currentClause);
         }
       }
@@ -145,17 +155,22 @@ void generateClauses(long currentVar, vector<string> &clauses) {
   // adding clause of neighbors
   loop(i, 0, GemailIncoming[currentVar - 1].size()) {
     // suppose currentVar maps to j + 1
-    loop(j, 0, GphoneIncoming.size()) {
-      // now i cannot map to a k such that there is no edge
+    loop(j, 0, correspondanceVector[currentVar - 1].size()) {  
+      // now i cannot map to a k + 1 such that there is no edge
       // from k to j + 1, but there is an edge from i to currentVar
-      loop(k, 0, GphoneIncoming.size()) {
-        if(k == j)
+      loop(k, 0, correspondanceVector[GemailIncoming[currentVar - 1][i] - 1].size()) {
+        long GphoneStartId = correspondanceVector[currentVar - 1][j];
+        long GphoneEndId = correspondanceVector[GemailIncoming[currentVar - 1][i] - 1][k];
+        if(GphoneStartId == GphoneEndId)
           continue;
-        // bool edgePresent = binary_search(GphoneIncoming[j].begin(), GphoneIncoming[j].end(), k + 1);
-        bool edgePresent = find(GphoneIncoming[j].begin(), GphoneIncoming[j].end(), k + 1) != GphoneIncoming[j].end();
+  
+        bool edgePresent = (find(GphoneIncoming[GphoneStartId - 1].begin(), GphoneIncoming[GphoneStartId - 1].end(), GphoneEndId) != GphoneIncoming[GphoneStartId - 1].end());
+        // bool edgePresent = find(GphoneIncoming[j].begin(), GphoneIncoming[j].end(), k + 1) != GphoneIncoming[j].end();
+        // && (find(correspondanceVector[currentVar - 1].begin(), correspondanceVector[currentVar - 1].end(), j + 1) != correspondanceVector[currentVar - 1].end())
+        // && (find(correspondanceVector[GemailIncoming[currentVar - 1][i] - 1].begin(), correspondanceVector[GemailIncoming[currentVar - 1][i] - 1].end(), k + 1) != correspondanceVector[GemailIncoming[currentVar - 1][i] - 1].end());
         if(!edgePresent) {
-          currentClause = to_string(-toVarNumber(currentVar, j + 1)) + " " 
-          + to_string(-toVarNumber(GemailIncoming[currentVar - 1][i], k + 1)) + " " + "0\n";
+          currentClause = to_string(-toVarNumber(currentVar, GphoneStartId)) + " " 
+          + to_string(-toVarNumber(GemailIncoming[currentVar - 1][i], GphoneEndId)) + " " + "0\n";
           clauses.push_back(currentClause);
         }
       }
@@ -177,28 +192,3 @@ void writeToFileForMiniSat(string fileName) {
   }
   fileOut.close();
 }
-
-// int main() {
-//   fileReader("test2.graphs");
-//   calculateCorrespondance();
-//   loop(i, 0, GemailOutgoing.size()) {
-//     cout<<i+1<<" ";
-//     loop(j, 0, GemailOutgoing[i].size())
-//       cout<<GemailOutgoing[i][j]<<" ";
-//     cout<<"\n";  
-//   }
-
-//   loop(i, 0, GphoneOutgoing.size()) {
-//     cout<<i+1<<" ";
-//     loop(j, 0, GphoneIncoming[i].size())
-//       cout<<GphoneIncoming[i][j]<<" ";
-//     cout<<"\n";  
-//   }
-//   vector<string> clauses;
-//   generateClauses(3, clauses);
-//   loop(i, 0 , clauses.size()) {
-//     cout<<clauses[i]<<endl;
-//   }
-//   writeToFileForMiniSat("test");
-//   return 0;
-// }
