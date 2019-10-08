@@ -45,7 +45,7 @@ void generateClausesForGphone(vector<string> &clauses) {
   loop(i, 0, GphoneOutgoing.size()) {
     loop(j, 0, signed(GemailOutgoing.size()) - 1) {
       loop(k, j + 1, GemailOutgoing.size()) {
-        // both k + 1 and j + 1 cannot map to same i
+        // both k + 1 and j + 1 cannot map to same i + 1
         currentClause = to_string(-toVarNumber(j + 1, i + 1)) + " " 
         + to_string(-toVarNumber(k + 1, i + 1)) + " " + "0\n";
         clauses.push_back(currentClause);
@@ -192,3 +192,39 @@ void writeToFileForMiniSat(string fileName) {
   }
   fileOut.close();
 }
+
+
+  // // currentVar maps to i + 1
+  // loop(i, 0, correspondanceVector[currentVar - 1].size()) {
+  //   long currentID = correspondanceVector[currentVar - 1][i];
+  //   // Now we consider all neighbours of currentVar
+  //   loop(j, 0, GemailOutgoing[currentVar - 1].size()) {
+  //     currentClause = to_string(-(toVarNumber(currentVar, i + 1))) + " ";
+  //     // Now we consider all neighbours of currentID
+  //     loop(k, 0, GphoneOutgoing[currentID - 1].size()) {
+  //       long temp = GemailOutgoing[currentVar - 1][j];
+  //       if(binary_search(correspondanceVector[temp - 1].begin(), correspondanceVector[temp-1].end(), GphoneOutgoing[currentID - 1][k])) {
+  //         currentClause += to_string(toVarNumber(temp, GphoneOutgoing[currentID - 1][k])) + " "; 
+  //       }      
+  //     }
+  //     currentClause += "0\n";
+  //     clauses.push_back(currentClause);
+  //   }
+  // }
+
+  // loop(i, 0, correspondanceVector[currentVar - 1].size()) {
+  //   long currentID = correspondanceVector[currentVar - 1][i];
+  //   // Now we consider all neighbours of currentVar
+  //   loop(j, 0, GemailIncoming[currentVar - 1].size()) {
+  //     currentClause = to_string(-(toVarNumber(currentVar, i + 1))) + " ";
+  //     // Now we consider all neighbours of currentID
+  //     loop(k, 0, GphoneIncoming[currentID - 1].size()) {
+  //       long temp = GemailIncoming[currentVar - 1][j];
+  //       if(binary_search(correspondanceVector[temp - 1].begin(), correspondanceVector[temp-1].end(), GphoneIncoming[currentID - 1][k])) {
+  //         currentClause += to_string(toVarNumber(temp, GphoneIncoming[currentID - 1][k])) + " "; 
+  //       }
+  //     }
+  //     currentClause += "0\n";
+  //     clauses.push_back(currentClause);
+  //   }
+  // }
