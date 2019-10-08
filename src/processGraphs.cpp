@@ -43,7 +43,7 @@ int toVarNumber(long i, long j) {
 void generateClausesForGphone(vector<string> &clauses) {
   string currentClause = "";
   loop(i, 0, GphoneOutgoing.size()) {
-    loop(j, 0, GemailOutgoing.size() - 1) {
+    loop(j, 0, signed(GemailOutgoing.size()) - 1) {
       loop(k, j + 1, GemailOutgoing.size()) {
         // both k + 1 and j + 1 cannot map to same i
         currentClause = to_string(-toVarNumber(j + 1, i + 1)) + " " 
@@ -114,7 +114,7 @@ void generateClauses(long currentVar, vector<string> &clauses) {
   }
   currentClause += "0\n";
   clauses.push_back(currentClause);
-  loop(i, 0, currentVarNumbers.size() - 1) {
+  loop(i, 0, signed(currentVarNumbers.size()) - 1) {
     loop(j, i + 1, currentVarNumbers.size()) {
       currentClause = to_string(-currentVarNumbers[i]) + " " 
       + to_string(-currentVarNumbers[j]) + " " + "0\n";
@@ -180,6 +180,12 @@ void generateClauses(long currentVar, vector<string> &clauses) {
 
 void writeToFileForMiniSat(string fileName) {
   calculateCorrespondance();
+  loop(i, 0, GemailIncoming.size()) {
+    cout<<i+1<<" ";
+    loop(j, 0, correspondanceVector[i].size())
+      cout<<correspondanceVector[i][j]<<" ";
+    cout<<endl;
+  }
   vector<string> clauses;
   loop(i, 0, GemailOutgoing.size()) {
     generateClauses(i + 1, clauses);

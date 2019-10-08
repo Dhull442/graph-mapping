@@ -97,4 +97,10 @@ void fileReaderGraph(string fileName) {
   size = max(GemailOutgoing.size(), GemailIncoming.size());
   fillVector(false, size, size);
   inFile.close();
+  // loop(i, 0, GemailIncoming.size()) {
+  //   cout<<i+1<<" ";
+  //   loop(j, 0, GemailOutgoing[i].size())
+  //     cout<<GemailOutgoing[i][j]<<" ";
+  //   cout<<endl;
+  // }
 }
