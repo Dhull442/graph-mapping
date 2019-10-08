@@ -180,12 +180,6 @@ void generateClauses(long currentVar, vector<string> &clauses) {
 
 void writeToFileForMiniSat(string fileName) {
   calculateCorrespondance();
-  loop(i, 0, GemailIncoming.size()) {
-    cout<<i+1<<" ";
-    loop(j, 0, correspondanceVector[i].size())
-      cout<<correspondanceVector[i][j]<<" ";
-    cout<<endl;
-  }
   vector<string> clauses;
   loop(i, 0, GemailOutgoing.size()) {
     generateClauses(i + 1, clauses);
