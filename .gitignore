@@ -13,3 +13,6 @@
 *.satinput
 *.satoutput
 *.mapping
+
+#Minisat file
+src/minisat
