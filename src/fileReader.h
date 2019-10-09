@@ -1,6 +1,5 @@
 #ifndef FILEREADER_INCLUDE
 #define FILEREADER_INCLUDE
-#include "utils.h"
 #include <vector>
 #define loop(i, start, end) for(long i = start; i < end; i++)
 
