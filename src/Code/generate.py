@@ -7,7 +7,7 @@ import random
 # import argparse
 
 """
-Adjust these parameters by hand.  
+Adjust these parameters by hand.
   the argparse package will not run on attu.cs.washington.edu
 """
 
@@ -16,7 +16,7 @@ G1edges = int(sys.argv[2]) # number of edges in larger graph
 G2nodes = int(sys.argv[3]) # number of nodes in smaller graph
 G2edges = int(sys.argv[4]) # number of edges in smaller graph
 
-guarantee_subgraph = False  # whether to deliberately make G2 a subgraph of G1
+guarantee_subgraph = True  # whether to deliberately make G2 a subgraph of G1
 allow_self_edges = False  # if true, a node can have an edge to itself
 print_digraph = False # if True, print in graphviz format for visualization
 do_xform = True # Sachin: Remove isolated nodes from Graphs
@@ -28,7 +28,7 @@ def makeGraph(nodeCount, edgeCount):
   if (not allow_self_edges) and edgeCount > math.factorial(nodeCount):
     print "Can't get ", edgeCount, " edges on ", nodeCount, " nodes without edges to self."
     raise Exception
-  nodeList = range(1,nodeCount+1) 
+  nodeList = range(1,nodeCount+1)
   edges = []
   for e in range(edgeCount):
     done = False
@@ -74,7 +74,7 @@ def renameGraph(N, Graph):
   random.shuffle(Nodes)
   translator = {}
   for e in Graph:
-    n1 = Nodes[e[0]-1] 
+    n1 = Nodes[e[0]-1]
     n2 = Nodes[e[1]-1]
     NewGraph.append( (n1,n2) )
   return NewGraph

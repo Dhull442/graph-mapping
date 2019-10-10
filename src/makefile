@@ -1,5 +1,5 @@
 # Compiler to use
-CXX = g++ -std=c++11
+CXX = g++ -std=c++0x
 
 # Flags
 CXXFLAGS = -Wall -g
