@@ -2,7 +2,7 @@
 CXX = g++ -std=c++0x
 
 # Flags
-CXXFLAGS = -Wall -g
+CXXFLAGS = -Wall -g -O3
 
 # Executable name
 OUT = main
