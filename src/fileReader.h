@@ -15,6 +15,12 @@ extern std::vector<std::vector<long> > GemailOutgoing;
 /// Gphone (larger) graph (contains according to ougoing edges)
 extern std::vector<std::vector<long> > GphoneOutgoing;
 
+/// vector which contains id of isolated nodes of Gphone
+extern std::vector<long> GphoneIsolated;
+
+/// vector which contains id of isolated nodes of Gemail
+extern std::vector<long> GemailIsolated;
+
 /// This function reads the .graphs file
 /// Parameters:
 /// - fileName: name of the file to be read

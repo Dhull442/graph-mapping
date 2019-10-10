@@ -43,6 +43,19 @@ int toVarNumber(long i, long j) {
   return (GphoneIncoming.size() * (i - 1) + j);
 }
 
+void generateClausesForIsolatedNodes(vector<string> &clauses) {
+  string currentClause;
+  if(GemailIsolated.size() > GphoneIsolated.size()) {
+    currentClause = "0\n";
+    clauses.push_back(currentClause);
+    return;
+  }
+  loop(i, 0, GemailIsolated.size()) {
+    currentClause = to_string(toVarNumber(GemailIsolated[i], GphoneIsolated[i])) + " 0\n";
+    clauses.push_back(currentClause);
+  }
+}
+
 /// This function adds clauses that removes mapping to same node in Gphone
 void generateClausesForGphone(vector<string> &clauses) {
   string currentClause = "";
@@ -214,12 +227,7 @@ void generateClauses(long currentVar, vector<string> &clauses) {
 void writeToFileForMiniSat(string fileName) {
   calculateCorrespondance();
   vector<string> clauses;
-  // loop(i, 0, GphoneCorrespondanceVector.size()) {
-  //   cout<<i+1<<" ";
-  //   loop(j, 0, GphoneCorrespondanceVector[i].size())
-  //     cout<<GphoneCorrespondanceVector[i][j]<<" ";
-  //   cout<<endl;
-  // }
+  generateClausesForIsolatedNodes(clauses);
   // loop(i, 0, correspondanceVector.size()) {
   //   cout<<i+1<<" ";
   //   loop(j, 0, correspondanceVector[i].size())
@@ -227,7 +235,8 @@ void writeToFileForMiniSat(string fileName) {
   //   cout<<endl;
   // }
   loop(i, 0, GemailOutgoing.size()) {
-    generateClauses(i + 1, clauses);
+    if(!binary_search(GemailIsolated.begin(), GemailIsolated.end(), i + 1))
+      generateClauses(i + 1, clauses);
   }
   
   generateClausesForGphone(clauses);

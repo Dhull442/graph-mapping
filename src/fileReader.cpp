@@ -18,6 +18,12 @@ vector<vector<long> > GemailOutgoing;
 /// Gphone (larger) graph (contains according to ougoing edges)
 vector<vector<long> > GphoneOutgoing;
 
+/// vector which contains id of isolated nodes of Gphone
+vector<long> GphoneIsolated;
+
+/// vector which contains id of isolated nodes of Gemail
+vector<long> GemailIsolated;
+
 /// This function fills a vector with empty vector upto size expectedSize
 /// Parameters
 /// - isGphone: if the vector to be filled is Gphone
@@ -97,10 +103,16 @@ void fileReaderGraph(string fileName) {
   size = max(GemailOutgoing.size(), GemailIncoming.size());
   fillVector(false, size, size);
   inFile.close();
-  // loop(i, 0, GemailIncoming.size()) {
-  //   cout<<i+1<<" ";
-  //   loop(j, 0, GemailOutgoing[i].size())
-  //     cout<<GemailOutgoing[i][j]<<" ";
-  //   cout<<endl;
-  // }
+  // filing Gemail isolated vector
+  loop(i, 0, GemailOutgoing.size()) {
+    if(GemailOutgoing[i].size() == 0 && GemailIncoming[i].size() == 0) {
+      GemailIsolated.push_back(i + 1);
+    }
+  }
+  // filling Gphone isolated vector
+  loop(i, 0, GphoneOutgoing.size()) {
+    if(GphoneOutgoing[i].size() == 0 && GphoneIncoming[i].size() == 0) {
+      GphoneIsolated.push_back(i + 1);
+    } 
+  } 
 }
