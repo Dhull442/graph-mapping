@@ -11,6 +11,7 @@ vector<vector<long> > notCorrespondanceVector;
 
 vector<vector<long> > GphoneCorrespondanceVector;
 
+vector<vector<string>> varNumbers;
 /// This function tells if id i can map to id j
 bool canMap(long i, long j) {
   return GphoneIncoming[j - 1].size() >= GemailIncoming[i - 1].size() &&
@@ -43,6 +44,15 @@ int toVarNumber(long i, long j) {
   return (GphoneIncoming.size() * (i - 1) + j);
 }
 
+void calculateVarNumbers() {
+  loop(i, 0, GemailOutgoing.size()) {
+    varNumbers.push_back(vector<string> ());
+    loop(j, 0, GphoneOutgoing.size()) {
+      varNumbers[i].push_back(to_string(toVarNumber(i + 1, j + 1)));
+    }
+  }
+}
+
 void generateClausesForIsolatedNodes(vector<string> &clauses) {
   string currentClause;
   if(GemailIsolated.size() > GphoneIsolated.size()) {
@@ -66,8 +76,8 @@ void generateClausesForGphone(vector<string> &clauses) {
         // both id1 and id2 cannot map to same i + 1
         id1 = GphoneCorrespondanceVector[i][j];
         id2 = GphoneCorrespondanceVector[i][k];
-        currentClause = to_string(-toVarNumber(id1, i + 1)) + " " 
-        + to_string(-toVarNumber(id2, i + 1)) + " " + "0\n";
+        currentClause = "-" + (varNumbers[id1 - 1][i]) + " -" 
+        + (varNumbers[id2 - 1][i]) + " " + "0\n";
         clauses.push_back(currentClause);
       }
     }
@@ -114,8 +124,8 @@ void generateClausesForGphone(vector<string> &clauses) {
           // bool edgePresent = binary_search(GphoneOutgoing[j].begin(), GphoneOutgoing[j].end(), k + 1);
           bool edgePresent = find(GemailOutgoing[startID - 1].begin(), GemailOutgoing[startID - 1].end(), endID) != GemailOutgoing[startID - 1].end();
           if(!edgePresent) {
-            currentClause = to_string(-toVarNumber(startID, l + 1)) + " " 
-            + to_string(-toVarNumber(endID, temp)) + " " + "0\n";
+            currentClause = "-" + (varNumbers[startID - 1][l]) + " -" 
+            + (varNumbers[endID - 1][temp - 1]) + " " + "0\n";
             clauses.push_back(currentClause);
           }
         }
@@ -125,30 +135,30 @@ void generateClausesForGphone(vector<string> &clauses) {
 }
 // TODO: It's possible that we get repeated clauses
 void generateClauses(long currentVar, vector<string> &clauses) {
-  vector<long> currentVarNumbers;
+  vector<string> currentVarNumbers;
   // TODO: can remove if ineffecient
   loop(i, 0, correspondanceVector[currentVar - 1].size()) {
-    currentVarNumbers.push_back(toVarNumber(currentVar, correspondanceVector[currentVar - 1][i]));
+    currentVarNumbers.push_back(varNumbers[currentVar - 1][correspondanceVector[currentVar - 1][i] - 1]);
   }
   string currentClause = "";
   // adding exactly one is true
   loop(i, 0, currentVarNumbers.size()) {
-    currentClause += (to_string(currentVarNumbers[i]) + " ");
+    currentClause += (currentVarNumbers[i] + " ");
   }
   currentClause += "0\n";
   clauses.push_back(currentClause);
   loop(i, 0, signed(currentVarNumbers.size()) - 1) {
     loop(j, i + 1, currentVarNumbers.size()) {
-      currentClause = to_string(-currentVarNumbers[i]) + " " 
-      + to_string(-currentVarNumbers[j]) + " " + "0\n";
+      currentClause = "-" + currentVarNumbers[i] + " -" 
+      + currentVarNumbers[j] + " " + "0\n";
       clauses.push_back(currentClause);
     }
   }
   // adding not of not correspondance
-  loop(i, 0, notCorrespondanceVector[currentVar - 1].size()) {
-    currentClause = to_string(-toVarNumber(currentVar, notCorrespondanceVector[currentVar - 1][i])) + " " + "0\n";
-    clauses.push_back(currentClause);
-  }
+  // loop(i, 0, notCorrespondanceVector[currentVar - 1].size()) {
+  //   currentClause = "-" + (varNumbers[currentVar - 1][notCorrespondanceVector[currentVar - 1][i] - 1]) + " " + "0\n";
+  //   clauses.push_back(currentClause);
+  // }
   bool isClauseEmpty;
   // currentVar maps to i + 1
   loop(i, 0, correspondanceVector[currentVar - 1].size()) {
@@ -156,13 +166,12 @@ void generateClauses(long currentVar, vector<string> &clauses) {
     // Now we consider all neighbours of currentVar
     loop(j, 0, GemailOutgoing[currentVar - 1].size()) {
       isClauseEmpty = true;
-      currentClause = to_string(-(toVarNumber(currentVar, currentID))) + " ";
+      currentClause = "-" + varNumbers[currentVar - 1][currentID - 1] + " ";
       // Now we consider all neighbours of currentID
       loop(k, 0, GphoneOutgoing[currentID - 1].size()) {
         long temp = GemailOutgoing[currentVar - 1][j];
-        if(find(correspondanceVector[temp - 1].begin(), correspondanceVector[temp-1].end(), GphoneOutgoing[currentID - 1][k])
-        != correspondanceVector[temp-1].end()) {
-          currentClause += to_string(toVarNumber(temp, GphoneOutgoing[currentID - 1][k])) + " ";
+        if(binary_search(correspondanceVector[temp - 1].begin(), correspondanceVector[temp-1].end(), GphoneOutgoing[currentID - 1][k])) {
+          currentClause += (varNumbers[temp - 1][GphoneOutgoing[currentID - 1][k] - 1]) + " ";
           isClauseEmpty = false; 
         }      
       }
@@ -226,6 +235,7 @@ void generateClauses(long currentVar, vector<string> &clauses) {
 
 void writeToFileForMiniSat(string fileName) {
   calculateCorrespondance();
+  calculateVarNumbers();
   vector<string> clauses;
   generateClausesForIsolatedNodes(clauses);
   // loop(i, 0, correspondanceVector.size()) {
@@ -241,10 +251,12 @@ void writeToFileForMiniSat(string fileName) {
   
   generateClausesForGphone(clauses);
   ofstream fileOut(fileName + ".satinput");
-  fileOut<<"p cnf "<<(GemailOutgoing.size() * GphoneOutgoing.size())<<" "<<clauses.size()<<"\n";
+  string answer = "";
+  answer += "p cnf " + to_string(GemailOutgoing.size() * GphoneOutgoing.size()) + " " + to_string(clauses.size()) + "\n";
   loop(i, 0 ,clauses.size()) {
-    fileOut<<clauses[i];
+    answer += clauses[i];
   }
+  fileOut<<answer;
   fileOut.close();
 }
 
